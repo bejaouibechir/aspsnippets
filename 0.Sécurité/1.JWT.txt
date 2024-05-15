@@ -1,0 +1,94 @@
+https://www.c-sharpcorner.com/article/jwt-json-web-token-authentication-in-asp-net-core/
+
+https://github.com/shawnwildermuth/codingshorts/tree/main/JwtInSeven
+
+
+
+dotnet new webapi -n JwtExample
+
+
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 6.0.0
+
+
+Program.cs
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+// ...
+
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "dotnet-user-jwts",
+        ValidAudience = "https://localhost:38558",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"))
+    };
+});
+
+
+
+
+Controller: 
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class ProtectedController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get()
+    {
+        // Your protected endpoint logic
+        return Ok(new { message = "This is a protected endpoint." });
+    }
+}
+
+
+Generate the token in ordrer to use it 
+
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+// ...
+
+var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key"));
+var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+var claims = new[]
+{
+    new Claim(ClaimTypes.Name, "username"),
+    new Claim(ClaimTypes.Role, "user"),
+};
+
+var token = new JwtSecurityToken(
+    issuer: "your-issuer",
+    audience: "your-audience",
+    claims: claims,
+    expires: DateTime.Now.AddMinutes(30), // Set token expiration time
+    signingCredentials: credentials
+);
+
+var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+
+
+
+
+
+

@@ -1,0 +1,208 @@
+nuget 
+PageList
+PageList.MVC
+
+--In action 
+
+ public ActionResult Index(int? page)
+        {     
+            var pagenumber = page ?? 1;
+            var pagesize = 10;
+            var missions = db.Missions.OrderByDescending(m=>m.Id).Include(m => m.AspNetUser)
+                .ToPagedList(pagenumber,pagesize);
+            return View(missions);
+        }
+
+--In view
+@model PagedList.IPagedList<Mission> <-- Le model
+@using PagedList;
+@using PagedList.Mvc;
+
+
+<div class="clear"></div>
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)/@Model.PageCount
+    <div class="div-pagination">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+ </div>
+
+
+
+
+
+
+
+
+
+--Implemented for tthe scratch
+
+Create a paginator class
+
+
+ public class Paginator<T> 
+    {
+        public List<T> Results { get; set; }
+        public int PerPage { get; set; }
+        public int PageNumber { get; set; }
+        public long TotalCount { get; set; }
+        public bool HasNextPage { get; set; }
+        public bool HasPreviousPage { get; set; }
+    }
+
+Create an extension of IQueryable
+
+public static class LinqExtensions
+    {
+        public static async Task<Paginator<T>> GetPagedResult<T>(this IQueryable<T> query,string SortingColumnName,
+                                                    int page, int pageSize) where T : class
+        {
+            var count = await query.CountAsync();
+            if (pageSize == 0) pageSize = count;
+            var filtered = await query.OrderByAtRuntime(SortingColumnName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new Paginator<T>
+            {
+                TotalCount = count,
+                Results = filtered,
+                PerPage = pageSize,
+                PageNumber = page
+            };
+        }
+
+        public static IQueryable<T> OrderByAtRuntime<T>(
+            this IQueryable<T> source,
+            string columnName,
+            bool isDescending = true)
+        {
+            if (string.IsNullOrEmpty(columnName))
+            {
+                return source;
+            }
+
+            ParameterExpression parameter = Expression.Parameter(source.ElementType, "");
+            MemberExpression property = Expression.Property(parameter, columnName);
+            LambdaExpression lambda = Expression.Lambda(property, parameter);
+
+            string methodName = isDescending ? "OrderByDescending" : "OrderBy";
+
+            Expression methodCallExpression = Expression.Call(typeof(Queryable), methodName,
+                new Type[] { source.ElementType, property.Type },
+                source.Expression, Expression.Quote(lambda));
+
+            return source.Provider.CreateQuery<T>(methodCallExpression);
+        }
+    }
+
+
+Create an Index Model 
+
+public class SupportIndexModel
+    {
+        public Paginator<Support> PageOfSupport { get; set; }
+    }
+
+
+At the controller level
+
+public async Task<ActionResult> Index(int page=1,int size=5)
+        {
+            var supports = await db.Supports.Include(s => s.BrancheLibrairie)
+                .GetPagedResult("Id",page,size);
+
+            if(supports!=null&&supports.Results.Any())
+            {
+                var viewModel = new SupportIndexModel
+                {
+                    PageOfSupport = supports
+                };
+                return View(viewModel);
+            }
+            var emtyModel = new SupportIndexModel
+            {
+                PageOfSupport = new Paginator<Support>
+                {
+                    Results = new List<Support>(),
+                    PerPage = size,
+                    PageNumber = page
+                }
+            };
+            return View(emtyModel);
+        }
+
+At the index view level 
+
+
+@*@model IEnumerable<MVCSample.Support>*@
+@model MVCSample.SupportIndexModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th scope="col" style="width: 10%">Disponibilité</th>
+        <th scope="col">NombreCopies</th>
+        <th scope="col">Region</th>
+    </tr>
+
+@foreach (var item in Model.PageOfSupport.Results) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Disponibilité)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NombreCopies)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BrancheLibrairie.Region)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+</table>
+
+<nav aria-label="Patron Table Navigation Bottom">
+    @{
+        var previousPage = (Model.PageOfSupport.PageNumber - 1);
+        var nextPage = (Model.PageOfSupport.PageNumber + 1);
+        var prevDisabled = !Model.PageOfSupport.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.PageOfSupport.HasNextPage ? "disabled" : "";
+    }
+    <ul class="pagination justify-content-end">
+        <li class="page-item small">
+            @Html.ActionLink("Previous", "Index", "Supports", new { page = previousPage }, new { @class = "page-link" })
+        </li>
+        <li class="page-item small">
+            @Html.ActionLink("Next", "Index", "Supports", new { page = nextPage }, new { @class = "page-link" })
+        </li>
+    </ul>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

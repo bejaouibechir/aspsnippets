@@ -1,0 +1,42 @@
+public class StringRangeAttribute : ValidationAttribute
+    {
+        public string[] AllowableValues { get; set; }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (AllowableValues?.Contains(value?.ToString()) == true)
+            {
+                return ValidationResult.Success;
+            }
+
+            var msg = $"Please enter one of the allowable values: {string.Join(", ", (AllowableValues ?? new string[] { "No allowable values found" }))}.";
+            return new ValidationResult(msg);
+        }
+    }
+
+
+
+//Use
+
+public class BookViewModel
+    {
+        public int Id { get; set; }
+        public string ProductName { get; set; }
+
+        public string Color { get; set; }
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter valid integer Number")]
+        public decimal? UnitPrice { get; set; }
+        [Range(0,100, ErrorMessage = "Please enter a percentage")]
+        public decimal? UnitPriceDiscount { get; set; }
+        [StringRange(AllowableValues = new[] { "M", "S", "R" },
+            ErrorMessage = "Gender must be either 'M','R' or 'S'.")]
+        public string ProductLine { get; set; }
+        [StringRange(AllowableValues = new[] { "M", "H" },
+           ErrorMessage = "Gender must be either 'M' or 'H'.")]
+        public string Class { get; set; }
+
+        [Range(0, double.MaxValue, ErrorMessage = "Please enter valid integer Number")]
+        public short? Quantity { get; set; }
+    }
+
+

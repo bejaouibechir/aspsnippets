@@ -1,0 +1,1 @@
+ <div><img src='@Url.Content($"~/UploadFiles/{Model.ImagePath}")' /></div>

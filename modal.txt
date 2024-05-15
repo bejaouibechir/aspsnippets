@@ -1,0 +1,42 @@
+$('#showModalBtn').on('click', function () {
+    $('#exampleModal').modal('show');
+});
+
+$('#closeBtn').on('click', function () {
+    $('#exampleModal').modal('toggle');
+});
+
+$('#mainCloseBtn').on('click', function () {
+    $('#exampleModal').modal('toggle');
+});
+
+
+
+
+/*
+  calling code
+      <a class="btn btn-primary" 
+            onclick="ShowInPopup('@Url.Action("Create","Transactions",null,Context.Request.Scheme)',
+            'New Transaction')">
+                Create New</a>
+*/
+
+
+ShowInPopup = (url, title) => {
+
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function (res) {
+            $("#formModal .modal-body").html(res)
+            $("#formModal .modal-title").html(title)
+            $("#formModal").modal('show')
+        }
+    })
+
+}
+
+
+$('#closeModalBtn').on('click', function () {
+    $('#formModal').modal('toggle');
+});

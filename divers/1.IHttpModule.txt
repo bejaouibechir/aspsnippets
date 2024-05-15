@@ -1,0 +1,29 @@
+ public class TraceModule : IHttpModule
+    {
+        HttpApplication _context;
+        public void Dispose()
+        { ;}
+
+        public void Init(HttpApplication context)
+        {
+            _context = context;
+            _context.BeginRequest += Context_BeginRequest;
+        }
+
+        private void Context_BeginRequest(object sender, EventArgs e)
+        {
+           
+            string message = $"{_context.Request.Url} " +
+               $"last visit is at {DateTime.Now.Hour}:{DateTime.Now.Minute}";
+            Debug.WriteLine(message);
+        }
+    }
+
+
+Ajouter cette section à la racine
+<system.webServer>
+    <modules>
+      <add name="TraceModule" type="WebMVC.Modules.TraceModule"/>
+    </modules>
+  </system.webServer>
+

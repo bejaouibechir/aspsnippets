@@ -1,0 +1,23 @@
+Add string parameter to Index 
+public async Task<ActionResult> Index(string sortOrder)
+
+Add Sorting mecanism
+switch (sortOrder)
+            {
+                case "Ascending":
+                    viewModel = await db.BrancheLibrairies
+                                       .OrderBy(bl => bl.Region).ToListAsync();
+                    break;
+                case "Descending":
+                    viewModel = await db.BrancheLibrairies
+                                        .OrderByDescending(bl=>bl.Region).ToListAsync();
+                    break;
+                default:
+                    viewModel = await db.BrancheLibrairies
+                                       .OrderByDescending(bl => bl.Region).ToListAsync();
+                    break;
+            }
+
+In the html view 
+    @Html.ActionLink("Ascending", "Index", new { sortOrder = "Ascending" })
+    @Html.ActionLink("Descending", "Index", new { sortOrder = "Descending" })

@@ -1,0 +1,3 @@
+<img src="~/Images/bechir.jpg" class="rounded-circle" height="80"
+     width="80"/>
+

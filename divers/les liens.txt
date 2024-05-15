@@ -1,0 +1,14 @@
+ @Html.ActionLink("Display Name", 
+"Action Name", 
+new { id = patron.Id },
+htmlattributes:new {@class='class name'}) 
+
+
+@Html.ActionLink("Retour vers Index",
+ "Index",
+"Home")
+
+ 
+<a asp-controller="Patron" asp-action="Detail" asp-route-id="@patron.Id">
+
+</a>

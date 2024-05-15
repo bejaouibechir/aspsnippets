@@ -1,0 +1,161 @@
+//Dans le controleur créer une vue
+
+
+ public ActionResult Popup()
+        {
+            
+            return PartialView();
+        }
+
+//Il faut genrer la page comme partial avec l'assisant de creation de vue 
+
+
+//Dans le html de la page hôte 
+@{
+    ViewBag.Title = "Page modale";
+}
+
+<title>@ViewBag.Title</title>
+
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+<div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-6">
+
+                    @*Button pour déclencher modal*@
+                    <button id="btnShowModal" type="button">
+                        Afficher modal
+                    </button>
+                    @*Button pour declencher modal*@ 
+                    @*Debut Modal*@
+                    <div class="modal fade" tabindex="-1" id="loginModal"
+                         data-keyboard="false" data-backdrop="static">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        ×
+                                    </button>
+                                    <h4 class="modal-title">Page popup</h4>
+                                </div>
+                                <div class="modal-body">
+                                    @Html.Partial("Popup");
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="btnHideModal">
+                                        Fermer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @*Fin Modal*@
+                </div>
+            </div>
+        </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#btnShowModal").click(function () {
+                $("#loginModal").modal('show');
+            });
+
+            $("#btnHideModal").click(function () {
+                $("#loginModal").modal('hide');
+            });
+        });
+</script> 
+
+
+
+<li>
+                        @Html.ActionLink("Create", "Create", null, null,
+                                      new { id = "btnCreate", @class = "btn btn-small btn-info" })
+                    </li>
+
+
+https://www.w3schools.com/bootstrap/tryit.asp?filename=trybs_modal&stacked=h
+https://www.w3schools.com/bootstrap/bootstrap_modal.asp
+https://www.youtube.com/watch?v=oHWEs8XWA2U
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Header</h2>
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h1>Some modal content</h1>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnOK">Confirmer</button>
+                    <button id="btnCancel">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+public ActionResult Popup()
+        {
+            return View();
+        }
+
+
+
+
+<button type="button" class="btn btn-primary" 
+        data-toggle="modal" data-target="#exampleModal">Insert</button>
+
+<div id="exampleModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customer Details Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Name:</label>
+                </div>
+                <div class="form-group">
+                    <label>Country:</label>
+                </div>
+                @Html.Partial("Content")
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    @if (Model != null)
+    {
+        <script type="text/javascript">
+            $(function () {
+                alert("Inserted Customer ID:");
+            });
+        </script>
+    }
+</div>
+

@@ -1,0 +1,13 @@
+Get form enumeration
+
+@Html.DropDownListFor(model => model.Status, new SelectList(Enum.GetValues(typeof(Status))), "Status")
+
+Get form hard coded SlectList
+
+<div class="form-group mt-3">
+                @Html.DropDownList("Status", new List<SelectListItem>
+               {
+                 new SelectListItem{Text="InStock",Value="InStock"},
+                 new SelectListItem{Text="OutStock",Value="OutStock"}
+               });
+            </div>

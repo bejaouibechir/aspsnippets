@@ -1,0 +1,79 @@
+Ajouter login partial au niveau du layout
+
+Program.cs 
+
+app.UseAuthorization();
+app.MapRazorPages();
+
+
+
+ <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    
+                </div>
+                <partial name="_loginpartial.cshtml"/>
+            </div>
+ </nav>
+
+
+La classe Application User
+
+public class ApplicationUser : IdentityUser
+{
+   
+    public  string FirstName { get; set; }
+
+    public string LastName { get; set; }
+}
+
+La classe DBContext
+
+
+public class MonWebAppContext : IdentityDbContext<ApplicationUser>
+{
+    public MonWebAppContext(DbContextOptions<MonWebAppContext> options)
+        : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        // Customize the ASP.NET Identity model and override the defaults if needed.
+        // For example, you can rename the ASP.NET Identity table names and more.
+        // Add your customizations after calling base.OnModelCreating(builder);
+
+        builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
+    }
+}
+
+public class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUser>
+{
+    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
+    {
+        builder.Property(u => u.FirstName).HasMaxLength(50);
+        builder.Property(u => u.LastName).HasMaxLength(50);
+    }
+}
+
+
+//Appsetting
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "MonWebAppContextConnection": "Server=PC2022;Database=LibDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+
+
+//Ajouter une migration 
+
+dotnet ef migrations add init 
+dotnet ef database update 
+

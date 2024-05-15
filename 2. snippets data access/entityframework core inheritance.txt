@@ -1,0 +1,5 @@
+modelBuilder.Entity<Product>()
+                .HasDiscriminator(p => p.Type)
+                .HasValue<Book>(ProductType.Book)
+                .HasValue<SupportMedia>(ProductType.SupprtMultiMedia)
+                .HasValue<Magazine>(ProductType.Magazine);

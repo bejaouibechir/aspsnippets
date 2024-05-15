@@ -1,0 +1,235 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+namespace Application.Web.Models
+{
+    public class DataContext
+    {
+
+        public DataContext(bool notlazy=false)
+        {
+            Departements = new List<Departement> { 
+              new Departement{Id=1, Pays="France", Cité="Paris", Nom="DG"},
+              new Departement{Id=2, Pays="France", Cité="Marseille", Nom="Marketing"},
+              new Departement{Id=3, Pays="France", Cité="Lile", Nom="Compatbilité"},
+              new Departement{Id=4, Pays="UK", Cité="Lile", Nom="Gestion Personnels"}
+            };
+
+            Employees = new List<Employee>
+            {
+                new Employee{Id=1,Post="General Director",  Login="Jaheim",
+                    Password="pass", Salary=25000, Dep = Departements[0]},
+
+                 new Employee{Id=2,Post="Director",  Login="Siraj",
+                    Password="pass", Salary=15000, Dep = Departements[0]},
+
+                  new Employee{Id=3,Post=" Director",  Login="Derek",
+                    Password="pass", Salary=15000, Dep = Departements[0]},
+
+                  new Employee{Id=4,Post="Employee",  Login="Tom",
+                    Password="pass", Salary=5000, Dep = Departements[0]},
+
+                 new Employee{Id=5,Post="Employee",  Login="Jia",
+                    Password="pass", Salary=5000, Dep = Departements[0]},
+
+                  new Employee{Id=6,Post="Employee",  Login="Gianluca",
+                    Password="pass", Salary=5000, Dep = Departements[1]},
+                  new Employee{Id=7,Post="Employee",  Login="Simone",
+                    Password="pass", Salary=5000, Dep = Departements[1]},
+
+                 new Employee{Id=8,Post="Employee",  Login="Dottie",
+                    Password="pass", Salary=5000, Dep = Departements[1]},
+
+                  new Employee{Id=9,Post="Employee",  Login="Reggie",
+                    Password="pass", Salary=5000, Dep = Departements[1]},
+                  new Employee{Id=10,Post="Employee",  Login="Michaela",
+                    Password="pass", Salary=5000, Dep = Departements[1]},
+
+                 new Employee{Id=11,Post="Employee",  Login="Raiden",
+                    Password="pass", Salary=5000, Dep = Departements[2]},
+
+                  new Employee{Id=13,Post="Employee",  Login="Ashton",
+                    Password="pass", Salary=5000, Dep = Departements[2]},
+                
+                new Employee{Id=13,Post="Employee",  Login="Dania",
+                    Password="pass", Salary=5000, Dep = Departements[2]},
+
+                 new Employee{Id=14,Post="Employee",  Login="Jaheim",
+                    Password="pass", Salary=5000, Dep = Departements[2]},
+
+                  new Employee{Id=15,Post="Employee",  Login="Harvey",
+                    Password="pass", Salary=5000, Dep = Departements[2]},
+
+                  new Employee{Id=16,Post="Employee",  Login="Cohen",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=17,Post="Employee",  Login="Alya",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=18,Post="Employee",  Login="Walter",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+                  new Employee{Id=19,Post="Employee",  Login="Kanye",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=20,Post="Employee",  Login="Ayla",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=21,Post="Employee",  Login="Adaline",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+                  new Employee{Id=22,Post="Employee",  Login="Frazer",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=23,Post="Employee",  Login="Humairaa",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=24,Post="Employee",  Login="Jovan",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+                  new Employee{Id=25,Post="Employee",  Login="Cleo",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=26,Post="Employee",  Login="Tye",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=27,Post="Employee",  Login="Wade",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=28,Post="Employee",  Login="Jorge",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=29,Post="Employee",  Login="Shanelle",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=30,Post="Employee",  Login="Adrienne",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+                  new Employee{Id=31,Post="Employee",  Login="Elif",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=32,Post="Employee",  Login="Everly",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                  new Employee{Id=33,Post="Employee",  Login="Drew",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+                  new Employee{Id=34,Post="Employee",  Login="Elora",
+                    Password="pass", Salary=5000, Dep = Departements[3]},
+
+                 new Employee{Id=35,Post="Employee",  Login="Joel",
+                    Password="pass", Salary=5000, Dep = Departements[4]},
+
+                  new Employee{Id=36,Post="Employee",  Login="Clayton",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                new Employee{Id=37,Post="Employee",  Login="Winni",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                 new Employee{Id=38,Post="Employee",  Login="Chase",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                  new Employee{Id=39,Post="Employee",  Login="Izabel",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                  new Employee{Id=44,Post="Employee",  Login="Loren",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                 new Employee{Id=41,Post="Employee",  Login="Killian",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                  new Employee{Id=42,Post="Employee",  Login="Terrence",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+                  new Employee{Id=43,Post="Employee",  Login="Roseanna",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                 new Employee{Id=44,Post="Employee",  Login="Shoaib",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                  new Employee{Id=45,Post="Employee",  Login="Graham",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+                  new Employee{Id=46,Post="Employee",  Login="Melody",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                 new Employee{Id=47,Post="Employee",  Login="Rufus",
+                    Password="pass", Salary=5444, Dep = Departements[4]},
+
+                  new Employee{Id=48,Post="Employee",  Login="Usama",
+                    Password="pass", Salary=5444, Dep = Departements[4]}
+            };
+
+            if(notlazy == true)
+            {
+                foreach (var dep in Departements)
+                {
+                    var query = (from d in Departements
+                                 join el in Employees
+                                 on d.Id equals el.Dep.Id
+                                 select el).ToList();
+                    dep.Employees = query;
+                }
+            }
+        }
+        
+        public List<Employee> Employees { get; set; }
+        public List<Departement> Departements { get; set; }
+
+        
+
+    }
+
+
+
+  public class Departement
+    {
+        public Departement()
+        {
+            Employees = new List<Employee>();
+        }
+        
+        public int Id { get; set; }
+        public string Nom { get; set; }
+        public string Cité { get; set; }
+        public string Pays { get; set; }
+
+        public List<Employee> Employees { get; set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Nom: {Nom}, Cité:{Cité}, Pays:{Pays}";
+        }
+    }
+
+
+using System;
+
+namespace Application.Web.Models
+{
+    public class Employee :User
+    {
+        public int ManagerId { get; set; }
+        public decimal Salary { get; set; }
+
+        public string Post { get; set; }
+
+        public Departement Dep{ get; set; }
+
+        public override string ToString()
+        {
+            return $"Id:{Id},Post: {Post}, Login:{Login}, Password: {Password}, Manager Id:{ManagerId}, Salary:{Salary}";
+        }
+    }
+}
+
+using System;
+namespace Application.Web.Models
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+        public override string ToString()
+        {
+            return $"Id:{Id}, Login:{Login}, Password: {Password}";
+        }
+
+    }
+}
+
+

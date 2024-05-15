@@ -1,0 +1,29 @@
+using X.PagedList;
+
+// GET: Transactions
+public IActionResult Index(int? page)
+{
+   var allproducts = _context.Transctions;
+
+   var pageNumber = page ?? 1; //
+   var pagedproducts = allproducts.ToPagedList<Transaction>(pageNumber, 10);
+
+   return View(pagedproducts);
+}
+
+
+in the viewimport.cs
+
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc;
+@using X.PagedList.Web.Common;
+
+in the index page
+
+@Html.PagedListPager(Model, page => Url.Action("Index", "Transactions",
+        new { Page = page }),
+        new PagedListRenderOptions {
+            LiElementClasses = new string[] { "page-item" },
+            PageClasses = new string[] { "page-link" }
+    });

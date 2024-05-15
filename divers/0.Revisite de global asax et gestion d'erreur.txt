@@ -1,0 +1,38 @@
+Application_Start(object sender, EventArgs e)
+Application_End(object sender, EventArgs e)
+Application_Error(object sender, EventArgs e)
+Session_Start(object sender, EventArgs e)
+void Session_End(object sender, EventArgs e)
+Application_Disposed()
+
+Application_BeginRequest()	lancée à chaque requête
+Application_AuthenticateRequest() lancée juste avant l'authentification (bonne pour placer du code de vérification)	
+Application_AuthorizeRequest()	lancée pour vérifier certaines authorisation d'un utilisateur
+Application_ResolveRequestCache() output caching	 
+Application_AcquireRequestState() lancée juste avant de remplir la session avec des données	
+Application_PreRequestHandlerExecute()	lancée avant que le gestionnaire de requêtes fait son traitement 
+Application_PostRequestHandlerExecute()	lancée juste après le traitement de la requête
+Application_ReleaseRequestState()
+Application_UpdateRequestCache()
+Application_EndRequest()
+
+ protected void Application_End()
+        {
+
+        }
+
+        void Application_Error(object sender, EventArgs e)
+        {
+            
+        }
+        void Session_Start(object sender, EventArgs e)
+        {
+             
+        }
+        void Session_End(object sender, EventArgs e)
+        {
+           
+        }
+
+
+

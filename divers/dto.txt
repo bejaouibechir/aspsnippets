@@ -1,0 +1,24 @@
+ static public class Mapper<U,T> where T:new()
+                               where U:new()
+    {
+        static public T Map(U u)
+        {
+            T t = new T();
+            PropertyInfo[] t_properties = t.GetType().GetProperties();
+            PropertyInfo[] u_properties = u.GetType().GetProperties();
+
+            foreach (var property_t in t_properties)
+            {
+                foreach (var property_u in u_properties)
+                {
+                    if (property_t.Name == property_u.Name &&
+                        property_t.GetType() == property_u.GetType())
+                    {
+                        property_t.SetValue(t, property_u.GetValue(u));
+                        break;
+                    }
+                }
+            }
+            return t;
+        }
+    }

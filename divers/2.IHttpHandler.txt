@@ -1,0 +1,39 @@
+Create a class with the code 
+ public class SimpleHandler : IHttpHandler
+    {
+        public RequestContext Context { get; set; }
+        #region IHttpHandler Members 
+
+        public SimpleHandler(RequestContext context)
+        {
+            Context = context;
+        }
+
+        bool IHttpHandler.IsReusable
+        {
+            get { return true; }
+        }
+
+        void IHttpHandler.ProcessRequest(HttpContext context)
+        {
+            HttpResponse response = context.Response;
+            response.Write("<html><body><h1>Wow.. We created our first handler");
+            response.Write("</h1></body></html>");
+        }
+        #endregion
+    }
+
+Create a handler rout in App_Start
+public class SimpleHandlerRoute : IRouteHandler
+    {
+        public IHttpHandler GetHttpHandler(RequestContext requestContext)
+        {
+            return new SimpleHandler(requestContext);
+        }
+    }
+
+Add route in route config
+
+routes.Add(new Route("Home/test", new SimpleHandlerRoute()));
+
+Add a view in test in Home

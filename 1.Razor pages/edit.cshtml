@@ -1,0 +1,49 @@
+@page "{id:int}"
+@model EditModel
+
+<h1>Edit Customer</h1>
+<form asp-page-handler="Edit" asp-route-id="@Model.Customer.Id" method="post">
+    <input type="hidden" asp-for="Customer.Id">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input class="form-control" type="text" id="name" name="Name" asp-for="Customer.Name">
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input class="form-control" type="email" id="email" name="Email" asp-for="Customer.Email">
+    </div>
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+public class EditModel : PageModel
+{
+    private readonly ApplicationDbContext _dbContext;
+
+    public EditModel(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    [BindProperty]
+    public Customer Customer { get; set; }
+
+    public void OnGet(int id)
+    {
+        Customer = _dbContext.Customers.Find(id);
+    }
+
+    public IActionResult OnPostEdit()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        var existingCustomer = _dbContext.Customers.Find(Customer.Id);
+        if (existingCustomer == null)
+        {
+           
+

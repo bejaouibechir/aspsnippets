@@ -1,0 +1,45 @@
+using System;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+
+namespace ConsoleClient
+{
+    public class ProductContext : DbContext
+    {
+        public ProductContext():base("name=ProductModel")
+        {
+            Database
+                .SetInitializer(new DropCreateDatabaseIfModelChanges<ProductContext>());
+        }
+
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder builder)
+        {
+            builder.Entity<Category>()
+                .HasKey(c => c.categoryid)
+                .HasMany(c => c.Products)
+                .WithRequired(c => c.Category);
+            builder.Entity<Product>()
+              .Property(e => e.unitprice)
+              .HasPrecision(19, 4);
+
+            builder.Entity<Supplier>()
+                .HasMany(e => e.Products)
+                .WithRequired(e => e.Supplier)
+                .WillCascadeOnDelete(false);
+
+            //Exprimer TPT Table Per Type
+            builder.Entity<Beers>().ToTable("Beers");
+            builder.Entity<Soda>().ToTable("Sodas");
+
+        }
+    }
+
+
+   
+  
+}

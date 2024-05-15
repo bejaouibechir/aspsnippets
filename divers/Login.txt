@@ -1,0 +1,39 @@
+first create a LoginViewModel class
+
+namespace MVCSample.Models
+{
+    public class LoginViewModel
+    {
+        public string Login { get; set; }
+        public string Password { get; set; }
+    }
+}
+
+
+for 
+public ActionResult Index()
+        {
+            return View();
+        }
+
+Generate a View with LoginViewModel as Model
+
+Add
+
+[HttpPost]
+        public ActionResult Index(LoginViewModel Credentials)
+        {
+            int hash = Credentials.Password.GetHashCode();
+            var user = (from el in dbContext.Acteurs
+                       where el.Nom == Credentials.Login && el.PasswordHash == hash
+                       select el).FirstOrDefault();
+            if(user!=null)
+            {
+                return RedirectToAction("Index", "Supports");
+            }
+            else
+            {
+                return RedirectToAction("Create","Acteur");
+            }  
+        }
+

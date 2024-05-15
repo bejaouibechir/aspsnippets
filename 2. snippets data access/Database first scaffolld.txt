@@ -1,0 +1,4 @@
+dotnet-ef dbcontext scaffold "Data Source=PC2022;Initial Catalog=BookShopDb;Integrated Security=True" Microsoft.EntityFrameworkCore.SqlServer -o Models
+
+
+dotnet-ef dbcontext scaffold "Data Source=PC2022;Initial Catalog=BookShopDb;Integrated Security=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -t Personnes

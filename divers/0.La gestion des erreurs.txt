@@ -1,0 +1,172 @@
+La methode la plus simple 
+
+Creer un ErrorViewModel
+
+public class ErrorViewModel
+    {
+        public Guid ErrorId { get; set; }
+        public DateTime ErrorDate { get; set; } = DateTime.Now;
+        public string Message { get; set; }
+        public IPrincipal User { get; set; } = HttpContext.Current.User;
+    }
+
+Genrer une shared view _Error sur la base du model ErrorViewModel
+
+Appeler la dans le code du contrôleur
+
+public ActionResult Test()
+        {
+            Response.StatusCode = (int)HttpStatusCode.NotFound;
+            if(Response.StatusCode ==(int)HttpStatusCode.NotFound)
+            {
+                ErrorViewModel model = new ErrorViewModel();
+                model.ErrorId = Guid.NewGuid();
+                model.Message = "Page not found";
+                return View("_Error",model);
+            }
+            return View();
+        }
+
+
+1. Dans le Web config activer la gestion d'erreurs
+
+<system.web>
+ <customErrors mode="On" defaultRedirect="~/Error.cshtml" redirectMode="ResponseRewrite">
+      <error statusCode="404" redirect="~/NotFound.cshtml"/>
+    </customErrors>
+
+<system.web>
+  <customErrors mode="RemoteOnly" defaultRedirect="/Error500.html" redirectMode="ResponseRewrite">
+    <error statusCode="403" redirect="/Error403.cshtml" />
+    <error statusCode="404" redirect="/Error404.cshtml" />
+    <error statusCode="500" redirect="/Error500.cshtml" />
+  </customErrors>
+</system.web>
+<system.webServer>
+  <httpErrors errorMode="DetailedLocalOnly" existingResponse="Auto">
+    <remove statusCode="403" />
+    <remove statusCode="404" />
+    <remove statusCode="500" />
+    <error statusCode="403" responseMode="File" path="/Error403.cshtml" />
+    <error statusCode="404" responseMode="File" path="/Error404.cshtml" />
+    <error statusCode="500" responseMode="File" path="/Error500.cshtml" />
+  </httpErrors>
+</system.webServer>
+
+
+Provoquer l'erreur
+
+Response.StatusCode = 404;
+            int flag = Response.StatusCode;
+
+            if(flag ==404)
+            {
+                return new HttpStatusCodeResult(System.Net.HttpStatusCode.NotFound);
+                //Or
+                return View("Error");
+            }
+            return View();
+
+
+
+
+
+example of Code to redirect to a view in contorller
+
+ public ActionResult Page()
+        {
+            ViewBag.Message = "Some page";
+            bool condition = true;
+            if(condition)
+            {
+                Response.StatusCode = 400;
+                return Redirect("/Error/NotFound");
+            }
+             else
+            {
+                Response.StatusCode = 200;
+                return View();
+            }
+            
+        }
+
+example of Code to redirect to a shared view
+
+ public ActionResult Page()
+        {
+            ViewBag.Message = "Some page";
+            bool condition = true;
+            if(condition)
+            {
+                Response.StatusCode = 400;
+                return Redirect("Error");
+            }
+             else
+            {
+                Response.StatusCode = 200;
+                return View();
+            }
+            
+        }
+
+
+Pour provoquer l'erreur
+return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+
+2. Pour capter les erreurs  
+
+ protected void Application_Error(object sender, EventArgs e)
+ {
+     var error = Server.GetLastError();
+ }
+
+
+
+3.Pour gérer les status code
+
+//Ajouter à global asax
+ protected void Application_EndRequest()
+{
+   if (Context.Response.StatusCode == 500)
+   {
+       Response.Clear();
+
+        var rd = new RouteData();
+        //rd.DataTokens["area"] = "AreaName"; // In case controller is in another area
+        rd.Values["controller"] = "Errors";
+        rd.Values["action"] = "NotFound";
+
+        IController c = new ErrorsController();
+         c.Execute(new RequestContext(new HttpContextWrapper(Context), rd));
+     }
+}
+
+
+Ajout un contrôleur d'erreurs
+
+public class ErrorController : Controller
+    {
+        // GET: Error
+        public ActionResult NotFound()
+        {
+            Response.StatusCode = (int)HttpStatusCode.NotFound;
+            ViewBag.Message = "This resource is not found";
+            return View();
+        }
+
+        public ActionResult ServerError()
+        {
+            Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            ViewBag.Message = "There is an internal server error";
+
+            return View();
+        }
+
+    }
+
+
+
+
+
+
+

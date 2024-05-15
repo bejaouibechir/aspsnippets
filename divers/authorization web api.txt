@@ -1,0 +1,71 @@
+public class BasicAuthenticationAttribute : AuthorizationFilterAttribute
+{
+    public override void OnAuthorization
+  (System.Web.Http.Controllers.HttpActionContext actionContext)
+    {
+        try
+        {
+            if (actionContext.Request.Headers.Authorization == null)
+            {
+                actionContext.Response = actionContext.Request.
+               CreateResponse(HttpStatusCode.Unauthorized);
+            }
+            else
+            {
+                // Gets header parameters  
+                string authenticationString = actionContext
+                .Request.Headers.Authorization.Parameter;
+                string originalString = Encoding.
+                UTF8.GetString(Convert.FromBase64String(authenticationString));
+
+                // Gets username and password  
+                string usrename = originalString.Split(':')[0];
+                string password = originalString.Split(':')[1];
+
+                AuthsController auth = new AuthsController();
+                // Validate username and password  
+                if (!auth.ValidateUser(usrename, password))
+                {
+                    // returns unauthorized error  
+                    actionContext.Response = actionContext.
+                    Request.CreateResponse(HttpStatusCode.Unauthorized);
+                }
+            }
+
+            base.OnAuthorization(actionContext);
+        }
+        // Handling Authorize: Basic <base64(username:password)> format.
+        catch(Exception e)
+        {
+            actionContext.Response = actionContext.Request.
+           CreateResponse(HttpStatusCode.Unauthorized);
+        }
+    }
+}
+
+
+In WebApiConfig.cs
+Add
+
+config.Filters.Add(new BasicAuthenticationAttribute());
+
+
+
+In Your controller that requires Basic Authorization.
+Add
+
+[BasicAuthentication]
+public class YourController : ApiController{.......}
+
+
+On client
+Basic authentication requires Authorization header to be set:
+
+using (var client = new WebClient())
+{    
+    var credential = String.Format("{0}:{1}", userName, password);
+    var encodedCredential = Convert.ToBase64String(Encoding.UTF8.GetBytes(credential))    
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedCredential);
+
+    // ...
+}

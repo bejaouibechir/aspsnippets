@@ -1,0 +1,176 @@
+using MVCSample.Models;
+using System;
+using System.Linq;
+using System.Net.Mail;
+using System.Web.Mvc;
+using System.Data.Entity;
+using System.Net;
+using System.IO;
+
+
+
+namespace MVCSample.Models
+{
+    public class LoginViewModel
+    {
+        public string Login { get; set; }
+        public string Password { get; set; }
+    }
+}
+
+
+namespace MVCSample.Models
+{
+    public class ForgotPasswordViewModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Mail { get; set; }
+    }
+}
+
+
+
+namespace MVCSample.Models
+{
+    public class ResetPasswordViewModel
+    {
+        [Required]
+        public string Password { get; set; }
+    }
+}
+
+
+
+
+
+
+namespace MVCSample.Controllers
+{
+    public class HomeController : Controller
+    {
+        LibV0Entities dbContext;
+        SessionManager<Acteur> sessionManager;
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            filterContext.ExceptionHandled = true;
+        }
+
+        public HomeController()
+        {
+            dbContext = new LibV0Entities();
+            sessionManager = new SessionManager<Acteur>();
+
+            Acteur moi =  
+                dbContext.Acteurs.Where(a => a.Id == 100).FirstOrDefault();
+            sessionManager.Current = moi;
+        }
+       
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Index(LoginViewModel Credentials)
+        {
+            int hash = Credentials.Password.GetHashCode();
+            var user = (from el in dbContext.Acteurs
+                       where el.Nom == Credentials.Login && el.PasswordHash == hash
+                       select el).FirstOrDefault();
+            if(user!=null)
+            {
+                return RedirectToAction("Index", "Supports");
+            }
+            else
+            {
+                return RedirectToAction("Index","Home");
+            }  
+        }
+
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+            return View();
+        }
+
+
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+
+            }
+
+            return View();
+        }
+
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            string currentUrl = Request.Url.AbsoluteUri;
+            if (ModelState.IsValid)
+            {
+                string extracted = currentUrl.Replace("http://localhost:54112/Home/ResetPassword?uid=",
+                    string.Empty);
+                string[] idAndToken = extracted.Split('+');
+                int id = int.Parse(idAndToken[1]);
+                var user = dbContext.Acteurs.Where(a => a.Id == id).FirstOrDefault();
+                if(user!=null && idAndToken[1] ==user.Token)
+                {
+                    user.PasswordHash = model.Password.GetHashCode();
+                    dbContext.SaveChanges();
+                }
+            }
+
+            return RedirectToAction("Index","Supports");
+        }
+
+
+        [HttpPost]
+        public ActionResult SendMail(ForgotPasswordViewModel model)
+        {
+            Guid guid = Guid.NewGuid();
+            Acteur acteur;
+            string url;
+            if (ModelState.IsValid)
+            {
+               acteur = dbContext.Acteurs.Where(a => a.Mail == model.Mail).FirstOrDefault();
+                url = $"http://localhost:54112/Home/ResetPassword?uid={guid.ToString()}+{acteur.Id}";
+               //Write code to send mail
+            }
+            return RedirectToAction("EmailSent");
+        }
+
+        private void writemail(string path,string content)
+        {
+            
+        }
+
+        private Guid generateToken() => Guid.NewGuid();
+
+        public ActionResult EmailSent()
+        {
+            ViewBag.Message = "The email is sent";
+            return View();
+        }
+
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+    }
+}

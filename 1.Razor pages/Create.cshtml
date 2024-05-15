@@ -1,0 +1,51 @@
+@page
+@model CreateModel
+
+<h1>Create Customer</h1>
+<form asp-page-handler="Create" method="post">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input class="form-control" type="text" id="name" name="Name">
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input class="form-control" type="email" id="email" name="Email">
+    </div>
+    <button class="btn btn-primary" type="submit">Create</button>
+</form>
+
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+public class CreateModel : PageModel
+{
+    private readonly ApplicationDbContext _dbContext;
+
+    public CreateModel(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    [BindProperty]
+    public Customer Customer { get; set; }
+
+    public void OnGet()
+    {
+    }
+
+    public IActionResult OnPostCreate()
+    {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        _dbContext.Customers.Add(Customer);
+        _dbContext.SaveChanges();
+
+        return RedirectToPage("Index");
+    }
+}
+
+

@@ -1,0 +1,5 @@
+return Redirect("/Error/NotFound"); <= controleur -> action 
+
+return RedirectToAction("Error"); <= action dans le même controleur
+
+return View() retourne la même vue

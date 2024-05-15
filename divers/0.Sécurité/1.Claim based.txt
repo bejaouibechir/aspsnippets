@@ -1,0 +1,91 @@
+ 
+register in filter
+ filters.Add(new ClaimsAuthorizeAttribute("grade","superadmin"));
+
+ 
+[Authorize]
+    public class HomeController : Controller
+    {
+        [AllowAnonymous]
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
+
+        [ClaimsAuthorize("grade","user")]
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+    }
+
+
+public class ClaimsAuthorizeAttribute : AuthorizeAttribute
+    {
+        private readonly string _claimtype;
+        private readonly string _claimvalue;
+
+        public ClaimsAuthorizeAttribute(string claimtype,string claimvalue)
+        {
+            _claimtype = claimtype;
+            _claimvalue = claimvalue;
+        }  
+        public override void OnAuthorization(AuthorizationContext filterContext)
+        {
+            bool flag = false;
+            var user = filterContext.HttpContext.User;
+            if(user.Identity.IsAuthenticated == false)
+            {
+                return;
+            }
+
+            if(user.Identity.IsAuthenticated==true)
+            {
+             var identity = user.Identity as ClaimsIdentity;
+                        IEnumerable<Claim> claims = identity.Claims;
+
+                        foreach (var item in claims)
+                        {
+                            if(_claimtype==item.Type && _claimvalue==item.Value)
+                            {
+                                base.OnAuthorization(filterContext);
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if(flag==false)
+                        {
+                             base.HandleUnauthorizedRequest(filterContext);
+                        }
+            }
+           
+            
+
+            /* var user = filterContext.HttpContext.User;
+            
+
+            if (user.GetType()!=typeof(GenericPrincipal))
+            {   
+                if (user != null && (user as ClaimsPrincipal).HasClaim(ClaimType, ClaimType))
+                {
+                    base.OnAuthorization(filterContext);
+                }
+                else
+                {
+                   
+                }
+            }*/
+        }
+    }
+
+
