@@ -1,0 +1,32 @@
+Install-Package PagedList.Mvc
+
+Le contrôleur
+
+using PagedList;
+
+public class HomeController : Controller
+{
+    ....
+    public ActionResult Index(int? page)
+    {
+        int pageSize = 10; // Nombre d'éléments par page
+        int pageNumber = (page ?? 1); // Numéro de page par défaut
+
+        var model = _context.YourData.ToList().ToPagedList(pageNumber, pageSize);
+        return View(model);
+    }
+}
+
+La vue
+
+@model PagedList.IPagedList<YourNamespace.YourModel>
+
+@foreach (var item in Model)
+{
+    <!-- Afficher les éléments de données -->
+}
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+
+
+

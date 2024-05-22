@@ -1,0 +1,38 @@
+@model IEnumerable<YourNamespace.Product>
+
+@foreach (var product in Model)
+{
+    <div>
+        <h2>@product.Name</h2>
+        <!-- Autres détails du produit -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal_@product.Id">
+            Details
+        </button>
+    </div>
+
+    <!-- Définition du modal pour les détails du produit -->
+    <div class="modal fade" id="productModal_@product.Id" tabindex="-1" role="dialog" aria-labelledby="productModalLabel_@product.Id" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel_@product.Id">Product Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="dl-horizontal">
+                        <dt>Name:</dt>
+                        <dd>@product.Name</dd>
+                        <dt>Description:</dt>
+                        <dd>@product.Description</dd>
+                        <!-- Autres détails du produit -->
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
