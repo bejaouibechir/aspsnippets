@@ -1,0 +1,236 @@
+Le module à implémenter
+
+using System;
+using System.IO;
+using System.Text;
+using System.Web;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+
+namespace WebApp1
+{
+    public class JwtAuthModule : IHttpModule
+    {
+        public void Init(HttpApplication context)
+        {
+            context.AuthenticateRequest += OnAuthenticateRequest;
+        }
+
+        public void Dispose()
+        {
+            // Dispose des ressources si nécessaire
+        }
+
+        private void OnAuthenticateRequest(object sender, EventArgs e)
+        {
+            var app = (HttpApplication)sender;
+            var context = app.Context;
+
+            // Vérifie si le token JWT est présent dans la requête
+            var token = context.Request.Headers["Authorization"];
+            if (!string.IsNullOrEmpty(token) && token.StartsWith("Bearer "))
+            {
+                token = token.Substring(7); // Supprimer "Bearer " du début
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                // Vérifie si le token est valide
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "DemoIssuer",
+                    ValidAudience = "DemoAudience",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("DemoSecretKey123"))
+                };
+
+                try
+                {
+                    SecurityToken validatedToken;
+                    var principal = handler.ValidateToken(token, validationParameters, out validatedToken);
+                    context.User = principal;
+                }
+                catch (SecurityTokenValidationException ex)
+                {
+                    // Le token n'est pas valide, traitement de l'erreur
+                }
+            }
+        }
+    }
+}
+
+Le controuleur d'authentification
+
+using System;
+using System.Security.Claims;
+using System.Web.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Linq;
+using System.Security.Cryptography;
+
+
+namespace WebApp1.Controllers
+{
+    public class AuthController : Controller
+    {
+        BanqueDBEntities _entities;
+        public AuthController()
+        {
+           _entities = new BanqueDBEntities(); 
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+    
+        [HttpPost]
+        public ActionResult Login([Bind(Include ="login,password")]string login, string password)
+        {
+            // Vérifie les informations d'identification de l'utilisateur
+            if (IsValidUser(login, password))
+            {
+                // Crée les claims de l'utilisateur
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.Name, login),
+                    new Claim(ClaimTypes.Role, "admin"),
+                };
+
+                byte[] keyBytes = new byte[32];
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    rng.GetBytes(keyBytes);
+                }
+                string base64Key = Convert.ToBase64String(keyBytes);
+                var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(base64Key));
+
+
+
+                // Crée le token JWT
+                var token = new JwtSecurityToken(
+                    issuer: "DemoIssuer",
+                    audience: "DemoAudience",
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(30),
+                    signingCredentials: new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256)
+                );
+
+                // Génère le token JWT
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                Session["Authorization"] = tokenString;
+                // Retourne le token JWT
+                //return Content(tokenString);
+                return RedirectToAction("Index", "Home");
+            }
+
+            return Content("Invalid username or password");
+        }
+
+        private bool IsValidUser(string username, string password)
+        {
+            User current = _entities.Users.Where(u=>u.login==username 
+            && u.Password==password).FirstOrDefault();    
+            return (current!=null);
+        }
+
+
+        public bool AuthenticateUser(string username, string password, out string role)
+        {
+            // Vérifie les informations d'identification de l'utilisateur
+            var user = _entities.Users.FirstOrDefault(u => u.login == username && u.Password == password);
+            if (user != null)
+            {
+                role = user.role;
+                return true;
+            }
+            role = null;
+            return false;
+        }
+    }
+}
+
+Le controleur d'utilisation
+
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Runtime.Remoting.Contexts;
+using System.Security.Claims;
+using System.Web;
+using System.Web.Mvc;
+
+namespace WebApp1.Controllers
+{
+    public class HomeController : Controller
+    {
+                
+        public ActionResult Public() { 
+            
+          return View();
+        }
+
+
+        public ActionResult Internal()
+        {
+            var token = ExtractTokenFromRequest();
+            if(token != null) { 
+                var handler = new JwtSecurityTokenHandler();
+                var claims = handler.ReadJwtToken(token).Claims;
+
+                var username = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+                return View();
+            
+            }
+            return Content("Vous n'êtes pas autorisé à voir ce contenu");
+        }
+
+        public ActionResult Panel()
+        {
+            var token = ExtractTokenFromRequest();
+            if (token != null)
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var claims = handler.ReadJwtToken(token).Claims;
+
+                var username = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                var role = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+                if(role=="admin") { 
+                return View();
+                }
+                else
+                {
+                    return Content("Vous n'avez pas les privilèges d'administrateur pour voir ce contenu");
+                }
+
+            }
+            return Content("Vous n'êtes pas autorisé à voir ce contenu");
+        }
+
+
+        private string ExtractTokenFromRequest()
+        {
+            var authHeader = Session["Authorization"] as string;
+            if (!string.IsNullOrEmpty(authHeader))
+            {
+                return authHeader; //.Substring("Bearer ".Length);
+            }
+            return null;
+        }
+
+
+       
+
+            }
+}
+
+
+
+

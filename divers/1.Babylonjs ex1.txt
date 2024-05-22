@@ -1,0 +1,37 @@
+Babylonjs  sans module
+
+<canvas id="renderCanvas" style="width: 100%; height: 400px;"></canvas>
+
+@section scripts {
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function(){
+        // Obtenez le canvas HTML5
+        var canvas = document.getElementById('renderCanvas');
+
+        // Créez un moteur de rendu Babylon.js
+        var engine = new BABYLON.Engine(canvas, true);
+
+        // Créez une scène Babylon.js
+        var scene = new BABYLON.Scene(engine);
+
+        // Ajoutez une caméra à la scène
+        var camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 5, -10), scene);
+        camera.setTarget(BABYLON.Vector3.Zero());
+        camera.attachControl(canvas, true);
+
+        // Ajoutez une lumière à la scène
+        var light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
+
+        // Ajoutez une sphère à la scène
+        var sphere = BABYLON.MeshBuilder.CreateSphere('sphere', { diameter: 2 }, scene);
+
+        // Démarrez le moteur de rendu
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+    });
+    </script>
+}
+
+
